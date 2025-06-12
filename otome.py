@@ -1,6 +1,16 @@
 import streamlit as st
 import json
 import time
+from datetime import datetim
+
+# CSS 스타일 (금색의 코르다 스타일)
+st.markdown("""
+<style>
+    /* 전체 배경 */
+    .stApp {
+        background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAGQAZADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD5/ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooimport streamlit as st
+import json
+import time
 from datetime import datetime
 
 # 페이지 설정
@@ -14,22 +24,70 @@ st.set_page_config(
 # CSS 스타일 (금색의 코르다 스타일)
 st.markdown("""
 <style>
-    /* 전체 배경 */
+    /* 전체 배경 - 책상과 꽃들을 연상시키는 배경 */
     .stApp {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        color: #f0f0f0;
+        background: linear-gradient(135deg, 
+            rgba(240, 248, 255, 0.95) 0%,
+            rgba(230, 245, 255, 0.95) 30%,
+            rgba(220, 240, 255, 0.95) 60%,
+            rgba(200, 230, 255, 0.95) 100%),
+            radial-gradient(circle at 20% 50%, rgba(135, 206, 250, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(176, 224, 230, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(240, 248, 255, 0.4) 0%, transparent 50%);
+        background-size: cover;
+        background-attachment: fixed;
+        color: #2c3e50;
+        min-height: 100vh;
     }
     
-    /* 메인 컨테이너 */
+    /* 페이지 패턴 추가 */
+    .stApp::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px);
+        background-size: 20px 20px;
+        z-index: -1;
+        opacity: 0.3;
+    }
+    
+    /* 메인 컨테이너 - 책과 종이 느낌 */
     .main-container {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
         border-radius: 20px;
         padding: 2rem;
         margin: 2rem auto;
         max-width: 800px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(135, 206, 250, 0.3);
+        box-shadow: 
+            0 8px 32px rgba(0, 100, 200, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        position: relative;
+    }
+    
+    /* 종이 질감 추가 */
+    .main-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 25px,
+            rgba(135, 206, 250, 0.1) 25px,
+            rgba(135, 206, 250, 0.1) 26px
+        );
+        border-radius: 20px;
+        pointer-events: none;
     }
     
     /* 제목 스타일 */
@@ -37,17 +95,17 @@ st.markdown("""
         text-align: center;
         font-size: 3rem;
         font-weight: bold;
-        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        background: linear-gradient(45deg, #4682b4, #87ceeb, #4682b4);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
     
     .game-subtitle {
         text-align: center;
         font-size: 1.2rem;
-        color: #e0e0e0;
+        color: #5a6c7d;
         margin-bottom: 2rem;
         font-style: italic;
     }
@@ -56,7 +114,7 @@ st.markdown("""
     .stButton > button {
         width: 100%;
         height: 60px;
-        background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(45deg, #87ceeb 0%, #4682b4 100%);
         color: white;
         border: none;
         border-radius: 15px;
@@ -64,54 +122,63 @@ st.markdown("""
         font-weight: bold;
         margin: 0.5rem 0;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 15px rgba(70, 130, 180, 0.3);
     }
     
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 6px 20px rgba(70, 130, 180, 0.4);
+        background: linear-gradient(45deg, #4682b4 0%, #87ceeb 100%);
     }
     
     /* 텍스트 입력 스타일 */
     .stTextInput > div > div > input {
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px solid rgba(135, 206, 235, 0.5);
         border-radius: 10px;
-        color: white;
+        color: #2c3e50;
         font-size: 1.1rem;
         padding: 10px;
     }
     
+    .stTextInput > div > div > input:focus {
+        border-color: #4682b4;
+        box-shadow: 0 0 10px rgba(70, 130, 180, 0.3);
+    }
+    
     /* 스토리 텍스트 박스 */
     .story-box {
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 15px;
         padding: 1.5rem;
         margin: 1rem 0;
-        border-left: 4px solid #ffd700;
+        border-left: 4px solid #4682b4;
         line-height: 1.8;
-        font-size: 1.1rem;
+        font-size: 1.3rem;
+        color: #2c3e50;
+        box-shadow: 0 2px 10px rgba(70, 130, 180, 0.1);
     }
     
     /* 선택지 버튼 */
     .choice-button {
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.8);
+        border: 2px solid rgba(135, 206, 235, 0.5);
         border-radius: 10px;
         padding: 1rem;
         margin: 0.5rem 0;
         cursor: pointer;
         transition: all 0.3s ease;
+        color: #2c3e50;
     }
     
     .choice-button:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: #ffd700;
+        background: rgba(135, 206, 235, 0.2);
+        border-color: #4682b4;
     }
     
     /* 캐릭터 이름 */
     .character-name {
-        color: #ffd700;
+        color: #4682b4;
         font-weight: bold;
         font-size: 1.2rem;
         margin-bottom: 0.5rem;
@@ -120,11 +187,33 @@ st.markdown("""
     /* 나레이션 */
     .narration {
         font-style: italic;
-        color: #d0d0d0;
+        color: #5a6c7d;
         margin: 1rem 0;
         padding: 1rem;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.7);
         border-radius: 10px;
+        font-size: 1.2rem;
+        line-height: 1.8;
+        border-left: 3px solid #87ceeb;
+    }
+    
+    /* 작은 버튼 스타일 */
+    .small-button {
+        width: 120px !important;
+        height: 35px !important;
+        font-size: 0.9rem !important;
+        margin: 0.2rem !important;
+    }
+    
+    /* 자동 진행 표시 */
+    .auto-progress {
+        text-align: center;
+        color: #5a6c7d;
+        font-size: 0.9rem;
+        margin: 1rem 0;
+        background: rgba(255, 255, 255, 0.6);
+        padding: 0.5rem;
+        border-radius: 8px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -359,6 +448,11 @@ def show_prologue():
     if scene_index < len(episode['scenes']):
         scene = episode['scenes'][scene_index]
         
+        # 자동 진행을 위한 타이머 설정
+        auto_advance_time = 4  # 4초 후 자동 진행
+        if 'scene_start_time' not in st.session_state:
+            st.session_state.scene_start_time = time.time()
+        
         if scene['type'] == 'narration':
             st.markdown(f'<div class="narration">{scene["text"]}</div>', unsafe_allow_html=True)
             
@@ -379,35 +473,68 @@ def show_prologue():
                         
                         # 다음 장면으로
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
+                        if 'scene_start_time' in st.session_state:
+                            del st.session_state.scene_start_time
                         st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
             return
         
-        # 다음 버튼
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col2:
-            if st.button("▶ 다음", key=f"next_{scene_index}"):
+        # 자동 진행 로직 (선택지가 아닌 경우에만)
+        elapsed_time = time.time() - st.session_state.scene_start_time
+        remaining_time = max(0, auto_advance_time - elapsed_time)
+        
+        # 자동 진행 표시
+        if remaining_time > 0:
+            st.markdown(f'<div class="auto-progress">⏰ {remaining_time:.1f}초 후 자동 진행 (다음 버튼으로 빠르게 진행 가능)</div>', unsafe_allow_html=True)
+            
+            # 자동 진행 타이머
+            progress_bar = st.progress(1 - (remaining_time / auto_advance_time))
+            
+            # 짧은 지연 후 페이지 새로고침
+            time.sleep(0.1)
+            if remaining_time <= 0.1:
                 if scene_index + 1 < len(episode['scenes']):
                     st.session_state.game_state['current_scene_index'] = scene_index + 1
                 else:
                     # 다음 에피소드로
                     st.session_state.game_state['current_episode'] = current_ep + 1
                     st.session_state.game_state['current_scene_index'] = 0
+                if 'scene_start_time' in st.session_state:
+                    del st.session_state.scene_start_time
+                st.rerun()
+            else:
+                # 자동 새로고침
+                st.rerun()
+        
+        # 수동 다음 버튼 (작게)
+        col1, col2, col3 = st.columns([2, 1, 2])
+        with col2:
+            if st.button("▶ 다음", key=f"next_{scene_index}", help="빠르게 넘어가기"):
+                if scene_index + 1 < len(episode['scenes']):
+                    st.session_state.game_state['current_scene_index'] = scene_index + 1
+                else:
+                    # 다음 에피소드로
+                    st.session_state.game_state['current_episode'] = current_ep + 1
+                    st.session_state.game_state['current_scene_index'] = 0
+                if 'scene_start_time' in st.session_state:
+                    del st.session_state.scene_start_time
                 st.rerun()
     
     # 진행 상황 표시
-    progress = (scene_index + 1) / len(episode['scenes'])
+    progress = min(max((scene_index + 1) / len(episode['scenes']), 0.0), 1.0)
     st.progress(progress)
     st.markdown(f'<p style="text-align: center; color: #888;">에피소드 {current_ep}/3 - 진행률: {int(progress * 100)}%</p>', unsafe_allow_html=True)
     
-    # 메뉴 버튼
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col1:
-        if st.button("🏠 메인 메뉴"):
+    # 메뉴 버튼 (작게)
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
+    with col2:
+        if st.button("🏠 메뉴", help="메인 메뉴로"):
             st.session_state.game_state['current_scene'] = 'main_menu'
+            if 'scene_start_time' in st.session_state:
+                del st.session_state.scene_start_time
             st.rerun()
-    with col3:
-        if st.button("💾 저장"):
+    with col4:
+        if st.button("💾 저장", help="현재 진행 저장"):
             save_game()
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -434,3 +561,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
