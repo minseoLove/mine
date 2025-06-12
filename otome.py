@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # CSS 스타일 (금색의 코르다 스타일)
-st.markdown("""
+st.markdown(r"""
 <style>
     /* 전체 배경 - 책상과 꽃들을 연상시키는 배경 */
     .stApp {
@@ -561,4 +561,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
