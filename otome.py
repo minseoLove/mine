@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # CSS 스타일 (금색의 코르다 스타일)
-st.markdown(r"""
+css_style = """
 <style>
     /* 전체 배경 - 책상과 꽃들을 연상시키는 배경 */
     .stApp {
@@ -30,30 +30,11 @@ st.markdown(r"""
             rgba(240, 248, 255, 0.95) 0%,
             rgba(230, 245, 255, 0.95) 30%,
             rgba(220, 240, 255, 0.95) 60%,
-            rgba(200, 230, 255, 0.95) 100%),
-            radial-gradient(circle at 20% 50%, rgba(135, 206, 250, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(176, 224, 230, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 40% 80%, rgba(240, 248, 255, 0.4) 0%, transparent 50%);
+            rgba(200, 230, 255, 0.95) 100%);
         background-size: cover;
         background-attachment: fixed;
         color: #2c3e50;
         min-height: 100vh;
-    }
-    
-    /* 페이지 패턴 추가 */
-    .stApp::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: 
-            linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px);
-        background-size: 20px 20px;
-        z-index: -1;
-        opacity: 0.3;
     }
     
     /* 메인 컨테이너 - 책과 종이 느낌 */
@@ -65,29 +46,8 @@ st.markdown(r"""
         margin: 2rem auto;
         max-width: 800px;
         border: 2px solid rgba(135, 206, 250, 0.3);
-        box-shadow: 
-            0 8px 32px rgba(0, 100, 200, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        box-shadow: 0 8px 32px rgba(0, 100, 200, 0.2);
         position: relative;
-    }
-    
-    /* 종이 질감 추가 */
-    .main-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 25px,
-            rgba(135, 206, 250, 0.1) 25px,
-            rgba(135, 206, 250, 0.1) 26px
-        );
-        border-radius: 20px;
-        pointer-events: none;
     }
     
     /* 제목 스타일 */
@@ -216,7 +176,9 @@ st.markdown(r"""
         border-radius: 8px;
     }
 </style>
-""", unsafe_allow_html=True)
+"""
+
+st.markdown(css_style, unsafe_allow_html=True)
 
 # 게임 데이터 초기화
 def init_game_data():
