@@ -21,164 +21,116 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS 스타일 (금색의 코르다 스타일)
-css_style = """
-<style>
-    /* 전체 배경 - 책상과 꽃들을 연상시키는 배경 */
-    .stApp {
-        background: linear-gradient(135deg, 
-            rgba(240, 248, 255, 0.95) 0%,
-            rgba(230, 245, 255, 0.95) 30%,
-            rgba(220, 240, 255, 0.95) 60%,
-            rgba(200, 230, 255, 0.95) 100%);
-        background-size: cover;
-        background-attachment: fixed;
-        color: #2c3e50;
-        min-height: 100vh;
-    }
-    
-    /* 메인 컨테이너 - 책과 종이 느낌 */
-    .main-container {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        padding: 2rem;
-        margin: 2rem auto;
-        max-width: 800px;
-        border: 2px solid rgba(135, 206, 250, 0.3);
-        box-shadow: 0 8px 32px rgba(0, 100, 200, 0.2);
-        position: relative;
-    }
-    
-    /* 제목 스타일 */
-    .game-title {
-        text-align: center;
-        font-size: 3rem;
-        font-weight: bold;
-        background: linear-gradient(45deg, #4682b4, #87ceeb, #4682b4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    .game-subtitle {
-        text-align: center;
-        font-size: 1.2rem;
-        color: #5a6c7d;
-        margin-bottom: 2rem;
-        font-style: italic;
-    }
-    
-    /* 버튼 스타일 */
-    .stButton > button {
-        width: 100%;
-        height: 60px;
-        background: linear-gradient(45deg, #87ceeb 0%, #4682b4 100%);
-        color: white;
-        border: none;
-        border-radius: 15px;
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin: 0.5rem 0;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(70, 130, 180, 0.3);
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(70, 130, 180, 0.4);
-        background: linear-gradient(45deg, #4682b4 0%, #87ceeb 100%);
-    }
-    
-    /* 텍스트 입력 스타일 */
-    .stTextInput > div > div > input {
-        background: rgba(255, 255, 255, 0.8);
-        border: 2px solid rgba(135, 206, 235, 0.5);
-        border-radius: 10px;
-        color: #2c3e50;
-        font-size: 1.1rem;
-        padding: 10px;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        border-color: #4682b4;
-        box-shadow: 0 0 10px rgba(70, 130, 180, 0.3);
-    }
-    
-    /* 스토리 텍스트 박스 */
-    .story-box {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        border-left: 4px solid #4682b4;
-        line-height: 1.8;
-        font-size: 1.3rem;
-        color: #2c3e50;
-        box-shadow: 0 2px 10px rgba(70, 130, 180, 0.1);
-    }
-    
-    /* 선택지 버튼 */
-    .choice-button {
-        background: rgba(255, 255, 255, 0.8);
-        border: 2px solid rgba(135, 206, 235, 0.5);
-        border-radius: 10px;
-        padding: 1rem;
-        margin: 0.5rem 0;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: #2c3e50;
-    }
-    
-    .choice-button:hover {
-        background: rgba(135, 206, 235, 0.2);
-        border-color: #4682b4;
-    }
-    
-    /* 캐릭터 이름 */
-    .character-name {
-        color: #4682b4;
-        font-weight: bold;
-        font-size: 1.2rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    /* 나레이션 */
-    .narration {
-        font-style: italic;
-        color: #5a6c7d;
-        margin: 1rem 0;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 10px;
-        font-size: 1.2rem;
-        line-height: 1.8;
-        border-left: 3px solid #87ceeb;
-    }
-    
-    /* 작은 버튼 스타일 */
-    .small-button {
-        width: 120px !important;
-        height: 35px !important;
-        font-size: 0.9rem !important;
-        margin: 0.2rem !important;
-    }
-    
-    /* 자동 진행 표시 */
-    .auto-progress {
-        text-align: center;
-        color: #5a6c7d;
-        font-size: 0.9rem;
-        margin: 1rem 0;
-        background: rgba(255, 255, 255, 0.6);
-        padding: 0.5rem;
-        border-radius: 8px;
-    }
-</style>
-"""
-
-st.markdown(css_style, unsafe_allow_html=True)
+# CSS 스타일 적용
+def apply_css():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background: linear-gradient(to bottom right, 
+                rgba(240, 248, 255, 0.95), 
+                rgba(230, 245, 255, 0.95), 
+                rgba(220, 240, 255, 0.95), 
+                rgba(200, 230, 255, 0.95));
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            border: 2px solid rgba(135, 206, 250, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 100, 200, 0.2);
+        }
+        
+        .game-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #4682b4;
+            margin-bottom: 1rem;
+        }
+        
+        .game-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #5a6c7d;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+        
+        .stButton > button {
+            width: 100% !important;
+            height: 60px !important;
+            background: #87ceeb !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 15px !important;
+            font-size: 1.2rem !important;
+            font-weight: bold !important;
+            margin: 0.5rem 0 !important;
+        }
+        
+        .stButton > button:hover {
+            background: #4682b4 !important;
+            transform: translateY(-2px);
+        }
+        
+        .stTextInput > div > div > input {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border: 2px solid rgba(135, 206, 235, 0.5) !important;
+            border-radius: 10px !important;
+            color: #2c3e50 !important;
+            font-size: 1.1rem !important;
+        }
+        
+        .story-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid #4682b4;
+            line-height: 1.8;
+            font-size: 1.3rem;
+            color: #2c3e50;
+        }
+        
+        .character-name {
+            color: #4682b4;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .narration {
+            font-style: italic;
+            color: #5a6c7d;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            border-left: 3px solid #87ceeb;
+        }
+        
+        .auto-progress {
+            text-align: center;
+            color: #5a6c7d;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 # 게임 데이터 초기화
 def init_game_data():
@@ -503,6 +455,9 @@ def show_prologue():
 
 # 메인 실행 함수
 def main():
+    # CSS 스타일 적용
+    apply_css()
+    
     init_game_data()
     
     current_scene = st.session_state.game_state.get('current_scene', 'main_menu')
