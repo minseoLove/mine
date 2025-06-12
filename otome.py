@@ -220,119 +220,125 @@ def show_main_menu():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 프롤로그 데이터
-PROLOGUE_EPISODES = {
-    1: {
-        'title': '운명적 탄생',
-        'scenes': [
-            {
-                'type': 'narration',
-                'text': '17년 전, 어느 작은 마을...\n\n달이 가장 높이 뜬 자정, 한 아이가 태어났다.'
-            },
-            {
-                'type': 'narration', 
-                'text': '그 순간, 마을 전체가 빛과 어둠으로 뒤덮였다.\n정오인데도 별이 보이고, 한밤중인데도 태양빛이 스며들었다.'
-            },
-            {
-                'type': 'dialogue',
-                'character': '마을 사람',
-                'text': '저, 저주받은 아이다...! 이상한 일이 일어나고 있어!'
-            },
-            {
-                'type': 'narration',
-                'text': '부모조차 갓난아기를 제대로 안아보지 못했다.\n작은 생명이 세상에 가져온 것은 축복이 아닌, 두려움이었다.'
-            }
-        ]
-    },
-    2: {
-        'title': '어린 시절의 따뜻한 기억들',
-        'scenes': [
-            {
-                'type': 'narration',
-                'text': '1-4살까지의 희미한 기억들...\n\n비록 짧았지만, 가족과 함께한 따뜻한 시간들이 있었다.'
-            },
-            {
-                'type': 'dialogue',
-                'character': '어머니',
-                'text': f'우리 {st.session_state.game_state.get("player_name", "공주")}가 제일 예뻐... ♪'
-            },
-            {
-                'type': 'narration',
-                'text': '어머니가 불러주던 자장가...\n아버지가 높이 들어올려 주던 따뜻한 손길...'
-            },
-            {
-                'type': 'narration',
-                'text': '남동생과 함께 그림 그리며 놀던 시간들...\n가족만의 작은 정원에서 꽃을 기르던 평온한 오후들...'
-            },
-            {
-                'type': 'dialogue',
-                'character': '아버지',
-                'text': f'우리 {st.session_state.game_state.get("player_name", "공주")}가 제일 예뻐!'
-            },
-            {
-                'type': 'narration',
-                'text': '그때는 몰랐다.\n이 작은 행복이 곧 끝날 것이라는 걸...'
-            }
-        ]
-    },
-    3: {
-        'title': '운명의 날',
-        'scenes': [
-            {
-                'type': 'narration',
-                'text': '5살 생일날...\n\n가족들이 준비해준 작은 생일 케이크를 받았다.'
-            },
-            {
-                'type': 'dialogue',
-                'character': '어린 ' + st.session_state.game_state.get('player_name', '나'),
-                'text': '와아! 케이크다! 고마워요!'
-            },
-            {
-                'type': 'narration',
-                'text': '너무 기뻐서 감정이 폭발했다.\n\n순간적으로 온 집이 빛으로 가득 차더니 급속히 어둠에 휩싸였다.'
-            },
-            {
-                'type': 'narration',
-                'text': '빛과 어둠이 충돌하며 집 전체가 무너지기 시작했다.\n\n모든 것이 혼돈에 빠졌다.'
-            },
-            {
-                'type': 'dialogue',
-                'character': '어머니',
-                'text': f'{st.session_state.game_state.get("player_name", "우리 아이")}... 괜찮아, 엄마가 지켜줄게...'
-            },
-            {
-                'type': 'narration',
-                'text': '정신을 잃기 전 마지막으로 본 것은...\n자신을 감싸 안은 어머니의 모습이었다.'
-            },
-            {
-                'type': 'narration',
-                'text': '...\n\n...\n\n깨어났을 때는 폐허 속에 혼자였다.\n가족은 모두 사라져 있었고, 그 이후 모든 기억이 사라졌다.'
-            },
-            {
-                'type': 'choice',
-                'text': '17년이 지난 지금...',
-                'options': [
-                    {
-                        'text': '아직도 그날의 악몽에 시달린다',
-                        'effects': {'confidence': -2, 'dark_control': +1}
-                    },
-                    {
-                        'text': '기억은 없지만 마음 한켠이 아프다', 
-                        'effects': {'confidence': -1, 'balance': +1}
-                    },
-                    {
-                        'text': '이제는 과거에 얽매이지 않겠다',
-                        'effects': {'confidence': +1, 'light_control': +1}
-                    }
-                ]
-            }
-        ]
+# 프롤로그 데이터 생성 함수
+def get_prologue_episodes():
+    player_name = st.session_state.game_state.get('player_name', '공주')
+    
+    return {
+        1: {
+            'title': '운명적 탄생',
+            'scenes': [
+                {
+                    'type': 'narration',
+                    'text': '17년 전, 어느 작은 마을...\n\n달이 가장 높이 뜬 자정, 한 아이가 태어났다.'
+                },
+                {
+                    'type': 'narration', 
+                    'text': '그 순간, 마을 전체가 빛과 어둠으로 뒤덮였다.\n정오인데도 별이 보이고, 한밤중인데도 태양빛이 스며들었다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '마을 사람',
+                    'text': '저, 저주받은 아이다...! 이상한 일이 일어나고 있어!'
+                },
+                {
+                    'type': 'narration',
+                    'text': '부모조차 갓난아기를 제대로 안아보지 못했다.\n작은 생명이 세상에 가져온 것은 축복이 아닌, 두려움이었다.'
+                }
+            ]
+        },
+        2: {
+            'title': '어린 시절의 따뜻한 기억들',
+            'scenes': [
+                {
+                    'type': 'narration',
+                    'text': '1-4살까지의 희미한 기억들...\n\n비록 짧았지만, 가족과 함께한 따뜻한 시간들이 있었다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '어머니',
+                    'text': f'우리 {player_name}가 제일 예뻐... ♪'
+                },
+                {
+                    'type': 'narration',
+                    'text': '어머니가 불러주던 자장가...\n아버지가 높이 들어올려 주던 따뜻한 손길...'
+                },
+                {
+                    'type': 'narration',
+                    'text': '남동생과 함께 그림 그리며 놀던 시간들...\n가족만의 작은 정원에서 꽃을 기르던 평온한 오후들...'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '아버지',
+                    'text': f'우리 {player_name}가 제일 예뻐!'
+                },
+                {
+                    'type': 'narration',
+                    'text': '그때는 몰랐다.\n이 작은 행복이 곧 끝날 것이라는 걸...'
+                }
+            ]
+        },
+        3: {
+            'title': '운명의 날',
+            'scenes': [
+                {
+                    'type': 'narration',
+                    'text': '5살 생일날...\n\n가족들이 준비해준 작은 생일 케이크를 받았다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': f'어린 {player_name}',
+                    'text': '와아! 케이크다! 고마워요!'
+                },
+                {
+                    'type': 'narration',
+                    'text': '너무 기뻐서 감정이 폭발했다.\n\n순간적으로 온 집이 빛으로 가득 차더니 급속히 어둠에 휩싸였다.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '빛과 어둠이 충돌하며 집 전체가 무너지기 시작했다.\n\n모든 것이 혼돈에 빠졌다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '어머니',
+                    'text': f'{player_name}... 괜찮아, 엄마가 지켜줄게...'
+                },
+                {
+                    'type': 'narration',
+                    'text': '정신을 잃기 전 마지막으로 본 것은...\n자신을 감싸 안은 어머니의 모습이었다.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '...\n\n...\n\n깨어났을 때는 폐허 속에 혼자였다.\n가족은 모두 사라져 있었고, 그 이후 모든 기억이 사라졌다.'
+                },
+                {
+                    'type': 'choice',
+                    'text': '17년이 지난 지금...',
+                    'options': [
+                        {
+                            'text': '아직도 그날의 악몽에 시달린다',
+                            'effects': {'confidence': -2, 'dark_control': +1}
+                        },
+                        {
+                            'text': '기억은 없지만 마음 한켠이 아프다', 
+                            'effects': {'confidence': -1, 'balance': +1}
+                        },
+                        {
+                            'text': '이제는 과거에 얽매이지 않겠다',
+                            'effects': {'confidence': +1, 'light_control': +1}
+                        }
+                    ]
+                }
+            ]
+        }
     }
-}
 
 # 프롤로그 표시
 def show_prologue():
     current_ep = st.session_state.game_state.get('current_episode', 1)
+    
+    # 프롤로그 데이터 동적 생성
+    PROLOGUE_EPISODES = get_prologue_episodes()
     
     if current_ep > len(PROLOGUE_EPISODES):
         st.session_state.game_state['current_scene'] = 'chapter_1'
