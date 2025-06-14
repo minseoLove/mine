@@ -129,20 +129,24 @@ st.markdown("""
         line-height: 1.8;
     }
     
-    /* 작은 버튼 스타일 */
-    .small-button {
-        width: 120px !important;
-        height: 35px !important;
-        font-size: 0.9rem !important;
-        margin: 0.2rem !important;
-    }
-    
     /* 자동 진행 표시 */
     .auto-progress {
         text-align: center;
         color: #888;
         font-size: 0.9rem;
         margin: 1rem 0;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.5rem;
+        border-radius: 8px;
+    }
+    
+    /* 설정 패널 */
+    .settings-panel {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -165,7 +169,10 @@ def init_game_data():
             },
             'story_flags': {},
             'choices_made': [],
-            'save_data': []
+            'save_data': [],
+            # 게임 설정
+            'auto_mode': False,
+            'auto_speed': 3.0  # 기본 3초
         }
 
 # 세이브 시스템
@@ -186,6 +193,47 @@ def load_game():
         st.error("저장된 게임이 없습니다.")
         return False
 
+# 설정 화면
+def show_settings():
+    st.markdown('<div class="main-container">', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; color: #ffd700;">⚙️ 게임 설정</h2>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="settings-panel">', unsafe_allow_html=True)
+    
+    # 오토 모드 설정
+    st.markdown("### 🤖 오토 모드")
+    auto_mode = st.checkbox("자동 진행 모드 활성화", 
+                           value=st.session_state.game_state.get('auto_mode', False))
+    st.session_state.game_state['auto_mode'] = auto_mode
+    
+    if auto_mode:
+        auto_speed = st.slider("자동 진행 속도 (초)", 
+                             min_value=1.0, max_value=10.0, 
+                             value=st.session_state.game_state.get('auto_speed', 3.0), 
+                             step=0.5)
+        st.session_state.game_state['auto_speed'] = auto_speed
+        
+        st.info(f"💡 {auto_speed}초마다 자동으로 다음 장면으로 넘어갑니다.")
+    else:
+        st.info("💡 버튼을 클릭해서 수동으로 진행합니다.")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 기타 설정
+    st.markdown('<div class="settings-panel">', unsafe_allow_html=True)
+    st.markdown("### 🎮 기타 설정")
+    st.info("더 많은 설정 기능이 추가될 예정입니다!")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 돌아가기 버튼
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("🏠 메인 메뉴로 돌아가기"):
+            st.session_state.game_state['current_scene'] = 'main_menu'
+            st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # 메인 메뉴
 def show_main_menu():
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
@@ -202,6 +250,10 @@ def show_main_menu():
     마법학원에서 펼쳐지는 여섯 남주와의 감동적인 로맨스 판타지
     </div>
     """, unsafe_allow_html=True)
+    
+    # 오토 모드 상태 표시
+    auto_status = "🤖 자동 모드 ON" if st.session_state.game_state.get('auto_mode', False) else "✋ 수동 모드"
+    st.markdown(f'<p style="text-align: center; color: #888; font-size: 0.9rem;">{auto_status}</p>', unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
@@ -234,7 +286,8 @@ def show_main_menu():
             save_game()
         
         if st.button("⚙️ 설정"):
-            st.info("설정 기능은 개발 중입니다!")
+            st.session_state.game_state['current_scene'] = 'settings'
+            st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -371,6 +424,13 @@ def show_prologue():
     # 에피소드 제목
     st.markdown(f'<h2 style="text-align: center; color: #ffd700;">📖 프롤로그 {current_ep} - {episode["title"]}</h2>', unsafe_allow_html=True)
     
+    # 오토 모드 상태 표시
+    auto_mode = st.session_state.game_state.get('auto_mode', False)
+    auto_speed = st.session_state.game_state.get('auto_speed', 3.0)
+    
+    if auto_mode:
+        st.markdown(f'<div class="auto-progress">🤖 자동 모드 - {auto_speed}초마다 자동 진행</div>', unsafe_allow_html=True)
+    
     # 장면별 표시
     scene_index = st.session_state.game_state.get('current_scene_index', 0)
     
@@ -378,8 +438,7 @@ def show_prologue():
         scene = episode['scenes'][scene_index]
         
         # 자동 진행을 위한 타이머 설정
-        auto_advance_time = 4  # 4초 후 자동 진행
-        if 'scene_start_time' not in st.session_state:
+        if auto_mode and 'scene_start_time' not in st.session_state:
             st.session_state.scene_start_time = time.time()
         
         if scene['type'] == 'narration':
@@ -408,41 +467,38 @@ def show_prologue():
             st.markdown('</div>', unsafe_allow_html=True)
             return
         
-        # 자동 진행 로직 (선택지가 아닌 경우에만)
-        elapsed_time = time.time() - st.session_state.scene_start_time
-        remaining_time = max(0, auto_advance_time - elapsed_time)
-        
-        # 자동 진행 표시
-        if remaining_time > 0:
-            st.markdown(f'<div class="auto-progress">⏰ {remaining_time:.1f}초 후 자동 진행 (다음 버튼으로 빠르게 진행 가능)</div>', unsafe_allow_html=True)
+        # 오토 모드 처리
+        if auto_mode and scene['type'] != 'choice':
+            elapsed_time = time.time() - st.session_state.scene_start_time
+            remaining_time = max(0, auto_speed - elapsed_time)
             
-            # 자동 진행 타이머
-            progress_bar = st.progress(1 - (remaining_time / auto_advance_time))
-            
-            # 짧은 지연 후 페이지 새로고침
-            time.sleep(0.1)
-            if remaining_time <= 0.1:
-                if scene_index + 1 < len(episode['scenes']):
-                    st.session_state.game_state['current_scene_index'] = scene_index + 1
+            if remaining_time > 0:
+                # 진행 바 표시
+                progress = 1 - (remaining_time / auto_speed)
+                st.progress(progress)
+                st.markdown(f'<div class="auto-progress">⏰ {remaining_time:.1f}초 후 자동 진행</div>', unsafe_allow_html=True)
+                
+                # 짧은 지연 후 페이지 새로고침
+                time.sleep(0.1)
+                if remaining_time <= 0.1:
+                    if scene_index + 1 < len(episode['scenes']):
+                        st.session_state.game_state['current_scene_index'] = scene_index + 1
+                    else:
+                        st.session_state.game_state['current_episode'] = current_ep + 1
+                        st.session_state.game_state['current_scene_index'] = 0
+                    if 'scene_start_time' in st.session_state:
+                        del st.session_state.scene_start_time
+                    st.rerun()
                 else:
-                    # 다음 에피소드로
-                    st.session_state.game_state['current_episode'] = current_ep + 1
-                    st.session_state.game_state['current_scene_index'] = 0
-                if 'scene_start_time' in st.session_state:
-                    del st.session_state.scene_start_time
-                st.rerun()
-            else:
-                # 자동 새로고침
-                st.rerun()
+                    st.rerun()
         
-        # 수동 다음 버튼 (작게)
+        # 수동 다음 버튼
         col1, col2, col3 = st.columns([2, 1, 2])
         with col2:
-            if st.button("▶ 다음", key=f"next_{scene_index}", help="빠르게 넘어가기"):
+            if st.button("▶ 다음", key=f"next_{scene_index}"):
                 if scene_index + 1 < len(episode['scenes']):
                     st.session_state.game_state['current_scene_index'] = scene_index + 1
                 else:
-                    # 다음 에피소드로
                     st.session_state.game_state['current_episode'] = current_ep + 1
                     st.session_state.game_state['current_scene_index'] = 0
                 if 'scene_start_time' in st.session_state:
@@ -454,16 +510,22 @@ def show_prologue():
     st.progress(progress)
     st.markdown(f'<p style="text-align: center; color: #888;">에피소드 {current_ep}/3 - 진행률: {int(progress * 100)}%</p>', unsafe_allow_html=True)
     
-    # 메뉴 버튼 (작게)
+    # 메뉴 버튼들
     col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
-    with col2:
-        if st.button("🏠 메뉴", help="메인 메뉴로"):
+    with col1:
+        if st.button("🏠 메뉴"):
             st.session_state.game_state['current_scene'] = 'main_menu'
             if 'scene_start_time' in st.session_state:
                 del st.session_state.scene_start_time
             st.rerun()
+    with col2:
+        if st.button("⚙️ 설정"):
+            st.session_state.game_state['current_scene'] = 'settings'
+            if 'scene_start_time' in st.session_state:
+                del st.session_state.scene_start_time
+            st.rerun()
     with col4:
-        if st.button("💾 저장", help="현재 진행 저장"):
+        if st.button("💾 저장"):
             save_game()
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -476,6 +538,8 @@ def main():
     
     if current_scene == 'main_menu':
         show_main_menu()
+    elif current_scene == 'settings':
+        show_settings()
     elif current_scene == 'prologue':
         show_prologue()
     elif current_scene == 'chapter_1':
