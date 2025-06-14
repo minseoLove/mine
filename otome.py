@@ -197,10 +197,162 @@ def init_game_data():
             'save_data': [],
             # 게임 설정
             'auto_mode': False,
-            'auto_speed': 3.0  # 기본 3초
+            'auto_speed': 3.0,
+            # 새로운 기능들
+            'bgm_enabled': True,
+            'sound_enabled': True,
+            'text_speed': 2,
+            'seen_scenes': set(),
+            'gallery_unlocked': [],
+            'current_route': None,
+            'total_playtime': 0,
+            'achievements': [],
+            'last_save_time': None
         }
 
-# 세이브 시스템
+# 스탯 및 호감도 표시 함수
+def show_status_panel():
+    st.sidebar.markdown("### 📊 캐릭터 스탯")
+    
+    # 플레이어 능력치
+    stats = st.session_state.game_state['player_stats']
+    st.sidebar.progress(min(stats['light_control'] / 10, 1.0))
+    st.sidebar.caption(f"✨ 빛의 힘: {stats['light_control']}/10")
+    
+    st.sidebar.progress(min(stats['dark_control'] / 10, 1.0))
+    st.sidebar.caption(f"🌙 어둠의 힘: {stats['dark_control']}/10")
+    
+    st.sidebar.progress(min(stats['balance'] / 10, 1.0))
+    st.sidebar.caption(f"⚖️ 균형: {stats['balance']}/10")
+    
+    st.sidebar.progress(min(stats['confidence'] / 10, 1.0))
+    st.sidebar.caption(f"💪 자신감: {stats['confidence']}/10")
+    
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 💕 호감도")
+    
+    # 남주들 호감도
+    affection = st.session_state.game_state['affection']
+    male_leads = {
+        'yoonho': '🎭 김윤호',
+        'doyoon': '📚 박도윤', 
+        'minjun': '⚔️ 이민준',
+        'joowon': '🎨 최주원',
+        'yoojun': '🔮 한유준',
+        'eunho': '🌟 정은호'
+    }
+    
+    for char_id, char_name in male_leads.items():
+        love_level = affection[char_id]
+        st.sidebar.progress(min(love_level / 100, 1.0))
+        
+        # 호감도에 따른 상태 표시
+        if love_level >= 80:
+            status = "💖 열렬한 사랑"
+        elif love_level >= 60:
+            status = "💕 깊은 애정"
+        elif love_level >= 40:
+            status = "💛 좋은 감정"
+        elif love_level >= 20:
+            status = "😊 호감"
+        else:
+            status = "😐 평범"
+            
+        st.sidebar.caption(f"{char_name}: {love_level}% ({status})")
+
+# 갤러리 기능
+def show_gallery():
+    st.markdown('<div class="main-container">', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; color: #333;">🖼️ 갤러리</h2>', unsafe_allow_html=True)
+    
+    unlocked = st.session_state.game_state.get('gallery_unlocked', [])
+    
+    if not unlocked:
+        st.info("🔒 아직 해금된 이미지가 없습니다. 스토리를 진행하여 특별한 순간들을 모아보세요!")
+    else:
+        cols = st.columns(3)
+        for i, img_id in enumerate(unlocked):
+            with cols[i % 3]:
+                st.image(f"placeholder_{img_id}.jpg", caption=f"추억 {img_id}")
+    
+    if st.button("🏠 메인 메뉴로"):
+        st.session_state.game_state['current_scene'] = 'main_menu'
+        st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# 업적 시스템
+def check_achievements():
+    achievements = st.session_state.game_state.get('achievements', [])
+    stats = st.session_state.game_state['player_stats']
+    affection = st.session_state.game_state['affection']
+    
+    # 새로운 업적 체크
+    new_achievements = []
+    
+    if 'first_choice' not in achievements and len(st.session_state.game_state['choices_made']) >= 1:
+        new_achievements.append('first_choice')
+    
+    if 'max_light' not in achievements and stats['light_control'] >= 10:
+        new_achievements.append('max_light')
+        
+    if 'max_dark' not in achievements and stats['dark_control'] >= 10:
+        new_achievements.append('max_dark')
+    
+    if 'first_love' not in achievements and any(love >= 50 for love in affection.values()):
+        new_achievements.append('first_love')
+    
+    # 새 업적이 있으면 알림
+    for achievement in new_achievements:
+        if achievement not in achievements:
+            achievements.append(achievement)
+            show_achievement_popup(achievement)
+    
+    st.session_state.game_state['achievements'] = achievements
+
+def show_achievement_popup(achievement_id):
+    achievement_data = {
+        'first_choice': {'title': '첫 번째 선택', 'desc': '첫 선택지를 완료했습니다', 'icon': '🎯'},
+        'max_light': {'title': '빛의 마스터', 'desc': '빛의 힘을 최대치로 올렸습니다', 'icon': '✨'},
+        'max_dark': {'title': '어둠의 지배자', 'desc': '어둠의 힘을 최대치로 올렸습니다', 'icon': '🌙'},
+        'first_love': {'title': '첫사랑의 시작', 'desc': '누군가와 깊은 유대를 형성했습니다', 'icon': '💕'}
+    }
+    
+    if achievement_id in achievement_data:
+        data = achievement_data[achievement_id]
+        st.success(f"🏆 업적 달성! {data['icon']} {data['title']}: {data['desc']}")
+
+# 업적 보기 화면
+def show_achievements():
+    st.markdown('<div class="main-container">', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; color: #333;">🏆 업적</h2>', unsafe_allow_html=True)
+    
+    achievement_data = {
+        'first_choice': {'title': '첫 번째 선택', 'desc': '첫 선택지를 완료했습니다', 'icon': '🎯'},
+        'max_light': {'title': '빛의 마스터', 'desc': '빛의 힘을 최대치로 올렸습니다', 'icon': '✨'},
+        'max_dark': {'title': '어둠의 지배자', 'desc': '어둠의 힘을 최대치로 올렸습니다', 'icon': '🌙'},
+        'first_love': {'title': '첫사랑의 시작', 'desc': '누군가와 깊은 유대를 형성했습니다', 'icon': '💕'},
+        'story_complete': {'title': '이야기의 끝', 'desc': '메인 스토리를 완료했습니다', 'icon': '📖'},
+        'perfect_balance': {'title': '완벽한 균형', 'desc': '빛과 어둠의 완벽한 조화를 이뤘습니다', 'icon': '⚖️'}
+    }
+    
+    unlocked = st.session_state.game_state.get('achievements', [])
+    
+    cols = st.columns(2)
+    for i, (ach_id, data) in enumerate(achievement_data.items()):
+        with cols[i % 2]:
+            if ach_id in unlocked:
+                st.success(f"{data['icon']} **{data['title']}**\n\n{data['desc']}")
+            else:
+                st.info(f"🔒 **???**\n\n미해금 업적")
+    
+    st.markdown(f"**진행률: {len(unlocked)}/{len(achievement_data)} ({int(len(unlocked)/len(achievement_data)*100)}%)**")
+    
+    if st.button("🏠 메인 메뉴로"):
+        st.session_state.game_state['current_scene'] = 'main_menu'
+        st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 def save_game():
     save_data = st.session_state.game_state.copy()
     save_data['save_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -261,10 +413,29 @@ def show_settings():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # 기타 설정
+    # 사운드 설정
     st.markdown('<div class="settings-panel">', unsafe_allow_html=True)
-    st.markdown("### 🎮 기타 설정")
-    st.info("더 많은 설정 기능이 추가될 예정입니다!")
+    st.markdown("### 🎵 사운드 설정")
+    
+    bgm_enabled = st.checkbox("배경음악 활성화", 
+                             value=st.session_state.game_state.get('bgm_enabled', True))
+    st.session_state.game_state['bgm_enabled'] = bgm_enabled
+    
+    sound_enabled = st.checkbox("효과음 활성화", 
+                               value=st.session_state.game_state.get('sound_enabled', True))
+    st.session_state.game_state['sound_enabled'] = sound_enabled
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 텍스트 설정
+    st.markdown('<div class="settings-panel">', unsafe_allow_html=True)
+    st.markdown("### 📝 텍스트 설정")
+    
+    text_speed = st.slider("텍스트 출력 속도", 
+                          min_value=1, max_value=5, 
+                          value=st.session_state.game_state.get('text_speed', 2))
+    st.session_state.game_state['text_speed'] = text_speed
+    
     st.markdown('</div>', unsafe_allow_html=True)
     
     # 돌아가기 버튼
@@ -331,6 +502,18 @@ def show_main_menu():
         if st.button("⚙️ 설정"):
             st.session_state.game_state['current_scene'] = 'settings'
             st.rerun()
+            
+        # 새로운 메뉴들
+        col_a, col_b = st.columns(2)
+        with col_a:
+            if st.button("🖼️ 갤러리"):
+                st.session_state.game_state['current_scene'] = 'gallery'
+                st.rerun()
+        
+        with col_b:
+            if st.button("🏆 업적"):
+                st.session_state.game_state['current_scene'] = 'achievements'
+                st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -595,6 +778,16 @@ def show_prologue():
                         for stat, value in option['effects'].items():
                             st.session_state.game_state['player_stats'][stat] += value
                         
+                        # 선택지 기록
+                        st.session_state.game_state['choices_made'].append({
+                            'episode': current_ep,
+                            'choice': option['text'],
+                            'effects': option['effects']
+                        })
+                        
+                        # 업적 체크
+                        check_achievements()
+                        
                         # 다음 장면으로
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
                         if 'scene_start_time' in st.session_state:
@@ -679,18 +872,25 @@ def show_prologue():
 def main():
     init_game_data()
     
+    # 사이드바에 스탯 표시
+    show_status_panel()
+    
     current_scene = st.session_state.game_state.get('current_scene', 'main_menu')
     
     if current_scene == 'main_menu':
         show_main_menu()
     elif current_scene == 'settings':
         show_settings()
+    elif current_scene == 'gallery':
+        show_gallery()
+    elif current_scene == 'achievements':
+        show_achievements()
     elif current_scene == 'prologue':
         show_prologue()
     elif current_scene == 'chapter_1':
         st.markdown('<div class="main-container">', unsafe_allow_html=True)
         st.markdown('<h2 style="text-align: center; color: #333;">🏫 Chapter 1 - 절망의 학원 생활</h2>', unsafe_allow_html=True)
-        st.markdown('<div class="story-box">Chapter 1은 개발 중입니다! 곧 업데이트 예정이에요 ✨</div>', unsafe_allow_html=True)
+        st.markdown('<div class="message-box">Chapter 1은 개발 중입니다! 곧 업데이트 예정이에요 ✨</div>', unsafe_allow_html=True)
         
         if st.button("🏠 메인 메뉴로 돌아가기"):
             st.session_state.game_state['current_scene'] = 'main_menu'
