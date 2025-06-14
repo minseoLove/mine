@@ -129,15 +129,42 @@ st.markdown("""
         line-height: 1.8;
     }
     
-    /* 자동 진행 표시 */
-    .auto-progress {
-        text-align: center;
-        color: #888;
-        font-size: 0.9rem;
-        margin: 1rem 0;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 0.5rem;
-        border-radius: 8px;
+    /* 메시지 박스 스타일 */
+    .message-box {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin: 2rem auto;
+        max-width: 600px;
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        color: #333;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        position: relative;
+    }
+    
+    /* 다음 버튼 스타일 */
+    .next-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    
+    .next-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
     
     /* 설정 패널 */
@@ -458,14 +485,14 @@ def show_prologue():
             st.session_state.scene_start_time = time.time()
         
         if scene['type'] == 'narration':
-            st.markdown(f'<div class="narration">{scene["text"]}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="message-box">{scene["text"]}</div>', unsafe_allow_html=True)
             
         elif scene['type'] == 'dialogue':
             st.markdown(f'<div class="character-name">{scene["character"]}</div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="story-box">"{scene["text"]}"</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="message-box">"{scene["text"]}"</div>', unsafe_allow_html=True)
             
         elif scene['type'] == 'choice':
-            st.markdown(f'<div class="narration">{scene["text"]}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="message-box">{scene["text"]}</div>', unsafe_allow_html=True)
             
             col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
@@ -483,36 +510,15 @@ def show_prologue():
             st.markdown('</div>', unsafe_allow_html=True)
             return
         
-        # 오토 모드 처리
+        # 오토 모드 처리 (화면에 표시하지 않음)
         if auto_mode and scene['type'] != 'choice':
-            elapsed_time = time.time() - st.session_state.scene_start_time
-            remaining_time = max(0, auto_speed - elapsed_time)
-            
-            if remaining_time > 0:
-                # 진행 바 표시
-                progress = 1 - (remaining_time / auto_speed)
-                st.progress(progress)
-                st.markdown(f'<div class="auto-progress">⏰ {remaining_time:.1f}초 후 자동 진행</div>', unsafe_allow_html=True)
+            if 'scene_start_time' not in st.session_state:
+                st.session_state.scene_start_time = time.time()
                 
-                # 자동 진행 처리
-                if remaining_time <= 0.5:  # 0.5초 남았을 때 진행
-                    if scene_index + 1 < len(episode['scenes']):
-                        st.session_state.game_state['current_scene_index'] = scene_index + 1
-                    else:
-                        st.session_state.game_state['current_episode'] = current_ep + 1
-                        st.session_state.game_state['current_scene_index'] = 0
-                    if 'scene_start_time' in st.session_state:
-                        del st.session_state.scene_start_time
-                    st.rerun()
-                else:
-                    # 1초마다 새로고침
-                    time.sleep(1)
-                    st.rerun()
-        
-        # 수동 다음 버튼
-        col1, col2, col3 = st.columns([2, 1, 2])
-        with col2:
-            if st.button("▶ 다음", key=f"next_{scene_index}"):
+            elapsed_time = time.time() - st.session_state.scene_start_time
+            
+            # 설정된 시간이 지나면 자동 진행
+            if elapsed_time >= auto_speed:
                 if scene_index + 1 < len(episode['scenes']):
                     st.session_state.game_state['current_scene_index'] = scene_index + 1
                 else:
@@ -521,6 +527,35 @@ def show_prologue():
                 if 'scene_start_time' in st.session_state:
                     del st.session_state.scene_start_time
                 st.rerun()
+            else:
+                # 0.5초마다 체크
+                time.sleep(0.5)
+                st.rerun()
+        
+        # 메시지 박스 스타일로 다음 버튼 (선택지가 아닌 경우)
+        if scene['type'] != 'choice':
+            st.markdown("""
+            <div style="
+                position: fixed;
+                bottom: 80px;
+                right: 30px;
+                z-index: 1000;
+            ">
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 하단 중앙에 다음 버튼
+            col1, col2, col3 = st.columns([4, 1, 4])
+            with col2:
+                if st.button("▶", key=f"next_{scene_index}", help="다음"):
+                    if scene_index + 1 < len(episode['scenes']):
+                        st.session_state.game_state['current_scene_index'] = scene_index + 1
+                    else:
+                        st.session_state.game_state['current_episode'] = current_ep + 1
+                        st.session_state.game_state['current_scene_index'] = 0
+                    if 'scene_start_time' in st.session_state:
+                        del st.session_state.scene_start_time
+                    st.rerun()
     
     # 진행 상황 표시
     progress = min(max((scene_index + 1) / len(episode['scenes']), 0.0), 1.0)
