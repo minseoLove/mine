@@ -16,20 +16,20 @@ st.markdown("""
 <style>
     /* 전체 배경 */
     .stApp {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        color: #f0f0f0;
+        background: #f5f5f5;
+        color: #333;
     }
     
     /* 메인 컨테이너 */
     .main-container {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(10px);
         border-radius: 20px;
         padding: 2rem;
         margin: 2rem auto;
         max-width: 800px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
     
     /* 제목 스타일 */
@@ -37,17 +37,15 @@ st.markdown("""
         text-align: center;
         font-size: 3rem;
         font-weight: bold;
-        background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #333;
         margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
     
     .game-subtitle {
         text-align: center;
         font-size: 1.2rem;
-        color: #e0e0e0;
+        color: #666;
         margin-bottom: 2rem;
         font-style: italic;
     }
@@ -74,10 +72,10 @@ st.markdown("""
     
     /* 텍스트 입력 스타일 */
     .stTextInput > div > div > input {
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(0, 0, 0, 0.2);
         border-radius: 10px;
-        color: white;
+        color: #333;
         font-size: 1.1rem;
         padding: 10px;
     }
@@ -111,7 +109,7 @@ st.markdown("""
     
     /* 캐릭터 이름 */
     .character-name {
-        color: #ffd700;
+        color: #333;
         font-weight: bold;
         font-size: 1.2rem;
         margin-bottom: 0.5rem;
@@ -136,8 +134,8 @@ st.markdown("""
         padding: 1.5rem;
         margin: 2rem auto;
         max-width: 600px;
-        border: 2px solid rgba(255, 215, 0, 0.3);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         color: #333;
         font-size: 1.1rem;
         line-height: 1.6;
@@ -169,11 +167,11 @@ st.markdown("""
     
     /* 설정 패널 */
     .settings-panel {
-        background: rgba(0, 0, 0, 0.8);
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 10px;
         padding: 1rem;
         margin: 1rem 0;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(0, 0, 0, 0.1);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -223,7 +221,7 @@ def load_game():
 # 설정 화면
 def show_settings():
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
-    st.markdown('<h2 style="text-align: center; color: #ffd700;">⚙️ 게임 설정</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; color: #333;">⚙️ 게임 설정</h2>', unsafe_allow_html=True)
     st.markdown('<p style="text-align: center; color: #888; font-size: 0.9rem;">조화로의 길: 빛과 어둠을 품은 소녀</p>', unsafe_allow_html=True)
     
     # 설정 패널
@@ -560,7 +558,7 @@ def show_prologue():
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
     
     # 에피소드 제목
-    st.markdown(f'<h2 style="text-align: center; color: #ffd700;">📖 프롤로그 {current_ep} - {episode["title"]}</h2>', unsafe_allow_html=True)
+    st.markdown(f'<h2 style="text-align: center; color: #333;">📖 프롤로그 {current_ep} - {episode["title"]}</h2>', unsafe_allow_html=True)
     
     # 오토 모드 상태 표시
     auto_mode = st.session_state.game_state.get('auto_mode', False)
@@ -691,7 +689,7 @@ def main():
         show_prologue()
     elif current_scene == 'chapter_1':
         st.markdown('<div class="main-container">', unsafe_allow_html=True)
-        st.markdown('<h2 style="text-align: center; color: #ffd700;">🏫 Chapter 1 - 절망의 학원 생활</h2>', unsafe_allow_html=True)
+        st.markdown('<h2 style="text-align: center; color: #333;">🏫 Chapter 1 - 절망의 학원 생활</h2>', unsafe_allow_html=True)
         st.markdown('<div class="story-box">Chapter 1은 개발 중입니다! 곧 업데이트 예정이에요 ✨</div>', unsafe_allow_html=True)
         
         if st.button("🏠 메인 메뉴로 돌아가기"):
