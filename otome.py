@@ -198,20 +198,36 @@ def show_settings():
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
     st.markdown('<h2 style="text-align: center; color: #ffd700;">⚙️ 게임 설정</h2>', unsafe_allow_html=True)
     
+    # 설정 패널
     st.markdown('<div class="settings-panel">', unsafe_allow_html=True)
     
     # 오토 모드 설정
     st.markdown("### 🤖 오토 모드")
+    
+    # 현재 설정값 표시
+    current_auto = st.session_state.game_state.get('auto_mode', False)
+    current_speed = st.session_state.game_state.get('auto_speed', 3.0)
+    
     auto_mode = st.checkbox("자동 진행 모드 활성화", 
-                           value=st.session_state.game_state.get('auto_mode', False))
-    st.session_state.game_state['auto_mode'] = auto_mode
+                           value=current_auto,
+                           key="auto_mode_checkbox")
+    
+    # 설정값 즉시 업데이트
+    if auto_mode != current_auto:
+        st.session_state.game_state['auto_mode'] = auto_mode
+        st.success("✅ 오토 모드 설정이 변경되었습니다!")
     
     if auto_mode:
         auto_speed = st.slider("자동 진행 속도 (초)", 
                              min_value=1.0, max_value=10.0, 
-                             value=st.session_state.game_state.get('auto_speed', 3.0), 
-                             step=0.5)
-        st.session_state.game_state['auto_speed'] = auto_speed
+                             value=current_speed, 
+                             step=0.5,
+                             key="auto_speed_slider")
+        
+        # 속도 설정값 즉시 업데이트
+        if auto_speed != current_speed:
+            st.session_state.game_state['auto_speed'] = auto_speed
+            st.success(f"✅ 자동 진행 속도가 {auto_speed}초로 설정되었습니다!")
         
         st.info(f"💡 {auto_speed}초마다 자동으로 다음 장면으로 넘어갑니다.")
     else:
@@ -478,9 +494,8 @@ def show_prologue():
                 st.progress(progress)
                 st.markdown(f'<div class="auto-progress">⏰ {remaining_time:.1f}초 후 자동 진행</div>', unsafe_allow_html=True)
                 
-                # 짧은 지연 후 페이지 새로고침
-                time.sleep(0.1)
-                if remaining_time <= 0.1:
+                # 자동 진행 처리
+                if remaining_time <= 0.5:  # 0.5초 남았을 때 진행
                     if scene_index + 1 < len(episode['scenes']):
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
                     else:
@@ -490,6 +505,8 @@ def show_prologue():
                         del st.session_state.scene_start_time
                     st.rerun()
                 else:
+                    # 1초마다 새로고침
+                    time.sleep(1)
                     st.rerun()
         
         # 수동 다음 버튼
