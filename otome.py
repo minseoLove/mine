@@ -5,7 +5,7 @@ from datetime import datetime
 
 # 페이지 설정
 st.set_page_config(
-    page_title="이중속성의 소녀",
+    page_title="조화로의 길: 빛과 어둠을 품은 소녀",
     page_icon="🌙",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -224,6 +224,7 @@ def load_game():
 def show_settings():
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
     st.markdown('<h2 style="text-align: center; color: #ffd700;">⚙️ 게임 설정</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align: center; color: #888; font-size: 0.9rem;">조화로의 길: 빛과 어둠을 품은 소녀</p>', unsafe_allow_html=True)
     
     # 설정 패널
     st.markdown('<div class="settings-panel">', unsafe_allow_html=True)
@@ -282,7 +283,8 @@ def show_main_menu():
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
     
     # 게임 제목
-    st.markdown('<h1 class="game-title">🌙 이중속성의 소녀 ✨</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="game-title">🌙 조화로의 길: 빛과 어둠을 품은 소녀 ✨</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align: center; color: #888; font-size: 1rem; margin-top: -1rem;">調和への道：光と闇を抱く少女</p>', unsafe_allow_html=True)
     st.markdown('<p class="game-subtitle">~ 빛과 어둠 사이에서 피어나는 사랑 ~</p>', unsafe_allow_html=True)
     
     # 분위기 있는 인트로 텍스트
@@ -344,20 +346,46 @@ def get_prologue_episodes():
             'scenes': [
                 {
                     'type': 'narration',
-                    'text': '17년 전, 어느 작은 마을...\n\n달이 가장 높이 뜬 자정, 한 아이가 태어났다.'
+                    'text': '17년 전, 어느 작은 마을의 한적한 밤...'
                 },
                 {
-                    'type': 'narration', 
+                    'type': 'narration',
+                    'text': '달이 가장 높이 뜬 자정, 운명적인 순간이 찾아왔다.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '한 아이가 이 세상에 태어나는 순간, 하늘과 땅이 요동쳤다.'
+                },
+                {
+                    'type': 'narration',
                     'text': '그 순간, 마을 전체가 빛과 어둠으로 뒤덮였다.\n정오인데도 별이 보이고, 한밤중인데도 태양빛이 스며들었다.'
                 },
                 {
                     'type': 'dialogue',
-                    'character': '마을 사람',
-                    'text': '저, 저주받은 아이다...! 이상한 일이 일어나고 있어!'
+                    'character': '마을 사람 1',
+                    'text': '이, 이게 무슨 일이야...! 낮과 밤이 뒤섞이고 있어!'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '마을 사람 2',
+                    'text': '저주받은 아이다! 분명 불길한 징조야!'
                 },
                 {
                     'type': 'narration',
-                    'text': '부모조차 갓난아기를 제대로 안아보지 못했다.\n작은 생명이 세상에 가져온 것은 축복이 아닌, 두려움이었다.'
+                    'text': '사람들은 두려움에 떨며 집 안으로 숨어들었다.\n부모조차 갓난아기를 제대로 안아보지 못했다.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '작은 생명이 세상에 가져온 것은 축복이 아닌, 깊은 두려움이었다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '산파',
+                    'text': '이 아이... 보통 아이가 아니에요. 뭔가 특별한 힘이 느껴져요.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '그 날 밤, 마을에는 이상한 소문이 퍼지기 시작했다.\n"천 년에 한 번 태어나는 이중속성자가 나타났다"고...'
                 }
             ]
         },
@@ -366,29 +394,47 @@ def get_prologue_episodes():
             'scenes': [
                 {
                     'type': 'narration',
-                    'text': '1-4살까지의 희미한 기억들...\n\n비록 짧았지만, 가족과 함께한 따뜻한 시간들이 있었다.'
+                    'text': '1-4살까지의 희미한 기억들...\n\n비록 짧았지만, 가족과 함께한 소중한 시간들이 있었다.'
                 },
                 {
                     'type': 'dialogue',
                     'character': '어머니',
-                    'text': f'우리 {player_name}가 제일 예뻐... ♪'
+                    'text': f'우리 {player_name}... 엄마가 가장 사랑하는 보물이야... ♪'
                 },
                 {
                     'type': 'narration',
-                    'text': '어머니가 불러주던 자장가...\n아버지가 높이 들어올려 주던 따뜻한 손길...'
-                },
-                {
-                    'type': 'narration',
-                    'text': '남동생과 함께 그림 그리며 놀던 시간들...\n가족만의 작은 정원에서 꽃을 기르던 평온한 오후들...'
+                    'text': '어머니는 매일 밤 따뜻한 자장가를 불러주셨다.\n그 목소리는 마법보다도 더 강력한 힘을 가지고 있었다.'
                 },
                 {
                     'type': 'dialogue',
                     'character': '아버지',
-                    'text': f'우리 {player_name}가 제일 예뻐!'
+                    'text': f'{player_name}아, 아빠가 높이 높이 들어올려줄게! 무서워하지 마!'
                 },
                 {
                     'type': 'narration',
-                    'text': '그때는 몰랐다.\n이 작은 행복이 곧 끝날 것이라는 걸...'
+                    'text': '아버지의 강하고 따뜻한 손길...\n그 품에서는 세상의 모든 두려움이 사라졌다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '남동생 민호',
+                    'text': f'누나! 같이 그림 그리자! 누나가 그린 꽃이 제일 예뻐!'
+                },
+                {
+                    'type': 'narration',
+                    'text': '남동생 민호와 함께 그림 그리며 놀던 평온한 오후들...\n가족만의 작은 정원에서 꽃을 기르던 행복한 시간들...'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '아버지',
+                    'text': f'{player_name}이는 특별한 아이야. 그 특별함을 두려워하지 말고, 자랑스러워해야 해.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '그때는 몰랐다.\n이 따뜻하고 소중한 행복이 곧 산산조각날 것이라는 걸...'
+                },
+                {
+                    'type': 'narration',
+                    'text': '그리고 그 모든 기억들이 깊은 어둠 속으로 사라져버릴 것이라는 걸...'
                 }
             ]
         },
@@ -397,49 +443,98 @@ def get_prologue_episodes():
             'scenes': [
                 {
                     'type': 'narration',
-                    'text': '5살 생일날...\n\n가족들이 준비해준 작은 생일 케이크를 받았다.'
-                },
-                {
-                    'type': 'dialogue',
-                    'character': f'어린 {player_name}',
-                    'text': '와아! 케이크다! 고마워요!'
-                },
-                {
-                    'type': 'narration',
-                    'text': '너무 기뻐서 감정이 폭발했다.\n\n순간적으로 온 집이 빛으로 가득 차더니 급속히 어둠에 휩싸였다.'
-                },
-                {
-                    'type': 'narration',
-                    'text': '빛과 어둠이 충돌하며 집 전체가 무너지기 시작했다.\n\n모든 것이 혼돈에 빠졌다.'
+                    'text': '5살 생일날... 가족들이 정성스럽게 준비해준 특별한 하루였다.'
                 },
                 {
                     'type': 'dialogue',
                     'character': '어머니',
-                    'text': f'{player_name}... 괜찮아, 엄마가 지켜줄게...'
+                    'text': f'{player_name}아, 생일 축하해! 엄마 아빠가 정말 특별한 케이크를 준비했어.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '아버지',
+                    'text': '우리 공주님, 5살이 되었구나. 촛불을 불어서 소원을 빌어봐.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': f'어린 {player_name}',
+                    'text': '와아! 케이크다! 너무 예뻐요! 가족들과 영원히 함께 있고 싶어요!'
                 },
                 {
                     'type': 'narration',
-                    'text': '정신을 잃기 전 마지막으로 본 것은...\n자신을 감싸 안은 어머니의 모습이었다.'
+                    'text': '그 순간, 너무나 순수하고 강렬한 감정이 폭발했다.\n기쁨, 사랑, 행복... 어린 마음이 감당하기엔 너무 큰 감정들이었다.'
                 },
                 {
                     'type': 'narration',
-                    'text': '...\n\n...\n\n깨어났을 때는 폐허 속에 혼자였다.\n가족은 모두 사라져 있었고, 그 이후 모든 기억이 사라졌다.'
+                    'text': '순간적으로 온 집이 눈부신 빛으로 가득 차더니 급속히 깊은 어둠에 휩싸였다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '민호',
+                    'text': '누나...? 무서워... 이게 뭐야...?'
+                },
+                {
+                    'type': 'narration',
+                    'text': '빛과 어둠이 격렬하게 충돌하며 집 전체가 무너지기 시작했다.\n모든 것이 혼돈 속으로 빨려들어갔다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '아버지',
+                    'text': f'{player_name}! 괜찮다, 아빠가 있어! 무서워하지 마!'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': '어머니',
+                    'text': f'{player_name}... 괜찮아, 엄마가 끝까지 지켜줄게... 사랑해...'
+                },
+                {
+                    'type': 'narration',
+                    'text': '정신을 잃어가는 마지막 순간...\n어머니가 자신을 감싸 안으며 속삭이던 따뜻한 목소리가 들렸다.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '그리고... 깊고 어두운 침묵이 찾아왔다.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '...\n\n...\n\n...'
+                },
+                {
+                    'type': 'narration',
+                    'text': '언제인지 모를 시간이 흐른 후, 작은 몸이 폐허 속에서 깨어났다.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '주변은 온통 잿더미와 부서진 잔해들뿐...\n가족은 어디에도 보이지 않았다.'
+                },
+                {
+                    'type': 'dialogue',
+                    'character': f'어린 {player_name}',
+                    'text': '엄마...? 아빠...? 민호는...? 여기... 여기가 어디예요...?'
+                },
+                {
+                    'type': 'narration',
+                    'text': '하지만 그 이후로는 아무것도 기억나지 않았다.\n모든 소중한 추억들이 깊은 어둠 속으로 사라져버렸다.'
+                },
+                {
+                    'type': 'narration',
+                    'text': '17년이 지난 지금까지도, 그날의 진실은 베일에 감싸여 있다.'
                 },
                 {
                     'type': 'choice',
-                    'text': '17년이 지난 지금...',
+                    'text': '17년이 지난 지금, 때때로 마음 깊은 곳에서 울려오는 목소리가 있다...',
                     'options': [
                         {
-                            'text': '아직도 그날의 악몽에 시달린다',
-                            'effects': {'confidence': -2, 'dark_control': +1}
+                            'text': '기억나지 않지만... 분명 소중한 사람들이 있었을 것이다',
+                            'effects': {'confidence': +1, 'light_control': +1}
                         },
                         {
-                            'text': '기억은 없지만 마음 한켠이 아프다', 
+                            'text': '이 공허함과 슬픔... 무언가 잃어버린 것 같다',
                             'effects': {'confidence': -1, 'balance': +1}
                         },
                         {
-                            'text': '이제는 과거에 얽매이지 않겠다',
-                            'effects': {'confidence': +1, 'light_control': +1}
+                            'text': '알 수 없는 죄책감이 나를 괴롭힌다',
+                            'effects': {'confidence': -2, 'dark_control': +1}
                         }
                     ]
                 }
