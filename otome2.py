@@ -1299,12 +1299,19 @@ def show_prologue():
                     if scene_index + 1 < len(episode['scenes']):
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
                     else:
-                        st.session_state.game_state['current_episode'] = current_ep + 1
-                        st.session_state.game_state['current_scene_index'] = 0
-                    if 'scene_start_time' in st.session_state:
-                        del st.session_state.scene_start_time
-                    st.rerun()
-    
+            # 프롤로그의 마지막 에피소드인지 확인
+                         PROLOGUE_EPISODES = get_prologue_episodes()
+                         if current_ep >= len(PROLOGUE_EPISODES):
+                             st.session_state.game_state['current_scene'] = 'chapter_1'
+                             st.session_state.game_state['current_episode'] = 1
+                             st.session_state.game_state['current_scene_index'] = 0
+                         else:
+                             st.session_state.game_state['current_episode'] = current_ep + 1
+                             st.session_state.game_state['current_scene_index'] = 0
+                if 'scene_start_time' in st.session_state:
+                    del st.session_state.scene_start_time
+                st.rerun()
+     
     # 진행 상황 표시
     progress = min(max((scene_index + 1) / len(episode['scenes']), 0.0), 1.0)
     st.progress(progress)
