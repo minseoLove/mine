@@ -1295,7 +1295,7 @@ def show_prologue():
             # 하단 중앙에 다음 버튼
             col1, col2, col3 = st.columns([4, 1, 4])
             with col2:
-                if st.button("▶", key=f"prologue_next_{current_ep}_{scene_index}", help="다음"):
+               if st.button("▶", key=f"prologue_next_{current_ep}_{scene_index}", help="다음"):
                     if scene_index + 1 < len(episode['scenes']):
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
                     else:
@@ -1311,7 +1311,6 @@ def show_prologue():
                 if 'scene_start_time' in st.session_state:
                     del st.session_state.scene_start_time
                 st.rerun()
-     
     # 진행 상황 표시
     progress = min(max((scene_index + 1) / len(episode['scenes']), 0.0), 1.0)
     st.progress(progress)
