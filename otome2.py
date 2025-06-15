@@ -170,22 +170,22 @@ def init_game_data():
             'last_save_time': None
         }
 
-# 스탯 및 호감도 표시 함수
+# 스탯 및 호감도 표시 함수 (오류 수정됨)
 def show_status_panel():
     st.sidebar.markdown("### 📊 캐릭터 스탯")
     
     # 플레이어 능력치
     stats = st.session_state.game_state['player_stats']
-    st.sidebar.progress(min(stats['light_control'] / 10, 1.0))
+    st.sidebar.progress(max(0.0, min(stats['light_control'] / 10, 1.0)))
     st.sidebar.caption(f"✨ 빛의 힘: {stats['light_control']}/10")
     
-    st.sidebar.progress(min(stats['dark_control'] / 10, 1.0))
+    st.sidebar.progress(max(0.0, min(stats['dark_control'] / 10, 1.0)))
     st.sidebar.caption(f"🌙 어둠의 힘: {stats['dark_control']}/10")
     
-    st.sidebar.progress(min(stats['balance'] / 10, 1.0))
+    st.sidebar.progress(max(0.0, min(stats['balance'] / 10, 1.0)))
     st.sidebar.caption(f"⚖️ 균형: {stats['balance']}/10")
     
-    st.sidebar.progress(min(stats['confidence'] / 10, 1.0))
+    st.sidebar.progress(max(0.0, min(stats['confidence'] / 10, 1.0)))
     st.sidebar.caption(f"💪 자신감: {stats['confidence']}/10")
     
     st.sidebar.markdown("---")
@@ -204,7 +204,7 @@ def show_status_panel():
     
     for char_id, char_name in male_leads.items():
         love_level = affection[char_id]
-        st.sidebar.progress(min(love_level / 100, 1.0))
+        st.sidebar.progress(max(0.0, min(love_level / 100, 1.0)))
         
         # 호감도에 따른 상태 표시
         if love_level >= 80:
@@ -330,7 +330,7 @@ def load_game():
     else:
         st.error("저장된 게임이 없습니다.")
         return False
-# 설정 화면
+# 설정 화면 (설정 즉시 반영 수정됨)
 def show_settings():
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
     st.markdown('<h2 style="text-align: center; color: #333;">⚙️ 게임 설정</h2>', unsafe_allow_html=True)
@@ -350,9 +350,9 @@ def show_settings():
                            value=current_auto,
                            key="auto_mode_checkbox")
     
-    # 설정값 즉시 업데이트
+    # 설정값 즉시 업데이트 (수정됨)
+    st.session_state.game_state['auto_mode'] = auto_mode
     if auto_mode != current_auto:
-        st.session_state.game_state['auto_mode'] = auto_mode
         st.success("✅ 오토 모드 설정이 변경되었습니다!")
     
     if auto_mode:
@@ -362,9 +362,9 @@ def show_settings():
                              step=0.5,
                              key="auto_speed_slider")
         
-        # 속도 설정값 즉시 업데이트
+        # 속도 설정값 즉시 업데이트 (수정됨)
+        st.session_state.game_state['auto_speed'] = auto_speed
         if auto_speed != current_speed:
-            st.session_state.game_state['auto_speed'] = auto_speed
             st.success(f"✅ 자동 진행 속도가 {auto_speed}초로 설정되었습니다!")
         
         st.info(f"💡 {auto_speed}초마다 자동으로 다음 장면으로 넘어갑니다.")
@@ -1194,7 +1194,7 @@ def get_chapter1_episodes():
         }
     }
 
-# 프롤로그 표시
+# 프롤로그 표시 (오토모드 및 전환 오류 수정됨)
 def show_prologue():
     current_ep = st.session_state.game_state.get('current_episode', 1)
     
@@ -1268,7 +1268,7 @@ def show_prologue():
                         st.rerun()
             return
         
-        # 오토 모드 처리 (화면에 표시하지 않음)
+        # 오토 모드 처리 (수정됨)
         if auto_mode and scene['type'] != 'choice':
             if 'scene_start_time' not in st.session_state:
                 st.session_state.scene_start_time = time.time()
@@ -1280,14 +1280,23 @@ def show_prologue():
                 if scene_index + 1 < len(episode['scenes']):
                     st.session_state.game_state['current_scene_index'] = scene_index + 1
                 else:
-                    st.session_state.game_state['current_episode'] = current_ep + 1
-                    st.session_state.game_state['current_scene_index'] = 0
+                    # 프롤로그의 마지막 에피소드인지 확인
+                    if current_ep >= len(PROLOGUE_EPISODES):
+                        st.session_state.game_state['current_scene'] = 'chapter_1'
+                        st.session_state.game_state['current_episode'] = 1
+                        st.session_state.game_state['current_scene_index'] = 0
+                    else:
+                        st.session_state.game_state['current_episode'] = current_ep + 1
+                        st.session_state.game_state['current_scene_index'] = 0
                 if 'scene_start_time' in st.session_state:
                     del st.session_state.scene_start_time
                 st.rerun()
             else:
-                # 0.5초마다 체크
-                time.sleep(0.5)
+                # 남은 시간 표시 (수정됨)
+                remaining = auto_speed - elapsed_time
+                st.markdown(f'<p style="text-align: center; color: #888;">⏱️ {remaining:.1f}초 후 자동 진행</p>', unsafe_allow_html=True)
+                # 자동 새로고침을 위해 1초 후 재실행
+                time.sleep(1)
                 st.rerun()
         
         # 메시지 박스 스타일로 다음 버튼 (선택지가 아닌 경우)
@@ -1295,11 +1304,11 @@ def show_prologue():
             # 하단 중앙에 다음 버튼
             col1, col2, col3 = st.columns([4, 1, 4])
             with col2:
-                 if st.button("▶", key=f"prologue_next_{current_ep}_{scene_index}", help="다음"):
+                if st.button("▶", key=f"prologue_next_{current_ep}_{scene_index}", help="다음"):
                     if scene_index + 1 < len(episode['scenes']):
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
                     else:
-                        # 프롤로그의 마지막 에피소드인지 확인
+                        # 프롤로그의 마지막 에피소드인지 확인 (수정됨)
                         PROLOGUE_EPISODES = get_prologue_episodes()
                         if current_ep >= len(PROLOGUE_EPISODES):
                             st.session_state.game_state['current_scene'] = 'chapter_1'
@@ -1311,6 +1320,7 @@ def show_prologue():
                     if 'scene_start_time' in st.session_state:
                         del st.session_state.scene_start_time
                     st.rerun()
+    
     # 진행 상황 표시
     progress = min(max((scene_index + 1) / len(episode['scenes']), 0.0), 1.0)
     st.progress(progress)
@@ -1350,7 +1360,7 @@ def show_prologue():
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Chapter 1 표시
+# Chapter 1 표시 (오토모드 및 전환 오류 수정됨)
 def show_chapter1():
     current_ep = st.session_state.game_state.get('current_episode', 1)
     
@@ -1429,7 +1439,7 @@ def show_chapter1():
                         st.rerun()
             return
         
-        # 오토 모드 처리 (화면에 표시하지 않음)
+        # 오토 모드 처리 (수정됨)
         if auto_mode and scene['type'] != 'choice':
             if 'scene_start_time' not in st.session_state:
                 st.session_state.scene_start_time = time.time()
@@ -1441,14 +1451,23 @@ def show_chapter1():
                 if scene_index + 1 < len(episode['scenes']):
                     st.session_state.game_state['current_scene_index'] = scene_index + 1
                 else:
-                    st.session_state.game_state['current_episode'] = current_ep + 1
-                    st.session_state.game_state['current_scene_index'] = 0
+                    # Chapter 1의 마지막 에피소드인지 확인
+                    if current_ep >= len(CHAPTER1_EPISODES):
+                        st.session_state.game_state['current_scene'] = 'chapter_2'
+                        st.session_state.game_state['current_episode'] = 1
+                        st.session_state.game_state['current_scene_index'] = 0
+                    else:
+                        st.session_state.game_state['current_episode'] = current_ep + 1
+                        st.session_state.game_state['current_scene_index'] = 0
                 if 'scene_start_time' in st.session_state:
                     del st.session_state.scene_start_time
                 st.rerun()
             else:
-                # 0.5초마다 체크
-                time.sleep(0.5)
+                # 남은 시간 표시 (수정됨)
+                remaining = auto_speed - elapsed_time
+                st.markdown(f'<p style="text-align: center; color: #888;">⏱️ {remaining:.1f}초 후 자동 진행</p>', unsafe_allow_html=True)
+                # 자동 새로고침을 위해 1초 후 재실행
+                time.sleep(1)
                 st.rerun()
         
         # 메시지 박스 스타일로 다음 버튼 (선택지가 아닌 경우)
@@ -1460,8 +1479,15 @@ def show_chapter1():
                     if scene_index + 1 < len(episode['scenes']):
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
                     else:
-                        st.session_state.game_state['current_episode'] = current_ep + 1
-                        st.session_state.game_state['current_scene_index'] = 0
+                        # Chapter 1의 마지막 에피소드인지 확인 (수정됨)
+                        CHAPTER1_EPISODES = get_chapter1_episodes()
+                        if current_ep >= len(CHAPTER1_EPISODES):
+                            st.session_state.game_state['current_scene'] = 'chapter_2'
+                            st.session_state.game_state['current_episode'] = 1
+                            st.session_state.game_state['current_scene_index'] = 0
+                        else:
+                            st.session_state.game_state['current_episode'] = current_ep + 1
+                            st.session_state.game_state['current_scene_index'] = 0
                     if 'scene_start_time' in st.session_state:
                         del st.session_state.scene_start_time
                     st.rerun()
