@@ -877,6 +877,7 @@ def show_prologue():
                     if current_ep >= len(PROLOGUE_EPISODES):
                         # 프롤로그 완료 플래그 설정
                         st.session_state.game_state['prologue_completed'] = True
+                        st.session_state.game_state['current_scene_index'] = scene_index + 1  # 핵심 수정!
                         check_achievements()  # 프롤로그 완료 업적 체크
                         # 자동으로 Chapter 1으로 넘어가지 않고 대기
                     else:
@@ -906,6 +907,7 @@ def show_prologue():
                         if current_ep >= len(PROLOGUE_EPISODES):
                             # 프롤로그 완료 플래그 설정
                             st.session_state.game_state['prologue_completed'] = True
+                            st.session_state.game_state['current_scene_index'] = scene_index + 1  # 핵심 수정!
                             check_achievements()  # 프롤로그 완료 업적 체크
                             # 자동으로 Chapter 1으로 넘어가지 않고 대기
                         else:
@@ -1191,4 +1193,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
