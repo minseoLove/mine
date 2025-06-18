@@ -712,8 +712,8 @@ def get_prologue_episodes():
             ]
         }
     }
+
 # Chapter 1 데이터 생성 함수
-# Chapter 1 데이터 생성 함수 (완전한 버전)
 def get_chapter1_episodes():
     player_name = st.session_state.game_state.get('player_name', '공주')
     
@@ -787,6 +787,232 @@ def get_chapter1_episodes():
             ]
         }
     }
+# 프롤로그 표시 (수정됨 - Chapter 1 진행 버튼 추가)
+def show_prologue():
+    current_ep = st.session_state.game_state.get('current_episode', 1)
+    
+    # 프롤로그 데이터 동적 생성
+    PROLOGUE_EPISODES = get_prologue_episodes()
+    
+    if current_ep > len(PROLOGUE_EPISODES):
+        st.session_state.game_state['current_scene'] = 'chapter_1'
+        st.session_state.game_state['current_episode'] = 1
+        st.session_state.game_state['current_scene_index'] = 0
+        st.rerun()
+        return
+    
+    episode = PROLOGUE_EPISODES[current_ep]
+    
+    st.markdown('<div class="main-container">', unsafe_allow_html=True)
+    
+    # 에피소드 제목
+    st.markdown(f'<h2 style="text-align: center; color: #333;">📖 프롤로그 {current_ep} - {episode["title"]}</h2>', unsafe_allow_html=True)
+    
+    # 오토 모드 상태 표시
+    auto_mode = st.session_state.game_state.get('auto_mode', False)
+    auto_speed = st.session_state.game_state.get('auto_speed', 3.0)
+    
+    if auto_mode:
+        st.markdown(f'<div style="text-align: center; color: #666; font-size: 0.9rem; margin: 1rem 0;">🤖 자동 모드 - {auto_speed}초마다 자동 진행</div>', unsafe_allow_html=True)
+    
+    # 장면별 표시
+    scene_index = st.session_state.game_state.get('current_scene_index', 0)
+    
+    if scene_index < len(episode['scenes']):
+        scene = episode['scenes'][scene_index]
+        
+        # 자동 진행을 위한 타이머 설정
+        if auto_mode and 'scene_start_time' not in st.session_state:
+            st.session_state.scene_start_time = time.time()
+        
+        if scene['type'] == 'narration':
+            st.markdown(f'<div class="message-box">{scene["text"]}</div>', unsafe_allow_html=True)
+            
+        elif scene['type'] == 'dialogue':
+            st.markdown(f'<div class="character-name">{scene["character"]}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="message-box">"{scene["text"]}"</div>', unsafe_allow_html=True)
+            
+        elif scene['type'] == 'choice':
+            st.markdown(f'<div class="message-box">{scene["text"]}</div>', unsafe_allow_html=True)
+            
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                for i, option in enumerate(scene['options']):
+                    if st.button(option['text'], key=f"prologue_choice_{current_ep}_{i}"):
+                        # 선택지 효과 적용
+                        for stat, value in option['effects'].items():
+                            st.session_state.game_state['player_stats'][stat] += value
+                        
+                        # 선택지 기록
+                        st.session_state.game_state['choices_made'].append({
+                            'chapter': 'prologue',
+                            'episode': current_ep,
+                            'choice': option['text'],
+                            'effects': option['effects']
+                        })
+                        
+                        # 업적 체크
+                        check_achievements()
+                        
+                        # 다음 장면으로
+                        st.session_state.game_state['current_scene_index'] = scene_index + 1
+                        if 'scene_start_time' in st.session_state:
+                            del st.session_state.scene_start_time
+                        st.rerun()
+            return
+        
+        # 오토 모드 처리
+        if auto_mode and scene['type'] != 'choice':
+            if 'scene_start_time' not in st.session_state:
+                st.session_state.scene_start_time = time.time()
+                
+            elapsed_time = time.time() - st.session_state.scene_start_time
+            
+            # 설정된 시간이 지나면 자동 진행
+            if elapsed_time >= auto_speed:
+                if scene_index + 1 < len(episode['scenes']):
+                    st.session_state.game_state['current_scene_index'] = scene_index + 1
+                else:
+                    # 프롤로그의 마지막 에피소드인지 확인
+                    if current_ep >= len(PROLOGUE_EPISODES):
+                        # 프롤로그 완료 플래그 설정
+                        st.session_state.game_state['prologue_completed'] = True
+                        check_achievements()  # 프롤로그 완료 업적 체크
+                        # 자동으로 Chapter 1으로 넘어가지 않고 대기
+                    else:
+                        st.session_state.game_state['current_episode'] = current_ep + 1
+                        st.session_state.game_state['current_scene_index'] = 0
+                if 'scene_start_time' in st.session_state:
+                    del st.session_state.scene_start_time
+                st.rerun()
+            else:
+                # 남은 시간 표시
+                remaining = auto_speed - elapsed_time
+                st.markdown(f'<p style="text-align: center; color: #888;">⏱️ {remaining:.1f}초 후 자동 진행</p>', unsafe_allow_html=True)
+                # 자동 새로고침을 위해 1초 후 재실행
+                time.sleep(1)
+                st.rerun()
+        
+        # 메시지 박스 스타일로 다음 버튼 (선택지가 아닌 경우)
+        if scene['type'] != 'choice':
+            # 하단 중앙에 다음 버튼
+            col1, col2, col3 = st.columns([4, 1, 4])
+            with col2:
+                if st.button("▶", key=f"prologue_next_{current_ep}_{scene_index}", help="다음"):
+                    if scene_index + 1 < len(episode['scenes']):
+                        st.session_state.game_state['current_scene_index'] = scene_index + 1
+                    else:
+                        # 프롤로그의 마지막 에피소드인지 확인
+                        if current_ep >= len(PROLOGUE_EPISODES):
+                            # 프롤로그 완료 플래그 설정
+                            st.session_state.game_state['prologue_completed'] = True
+                            check_achievements()  # 프롤로그 완료 업적 체크
+                            # 자동으로 Chapter 1으로 넘어가지 않고 대기
+                        else:
+                            st.session_state.game_state['current_episode'] = current_ep + 1
+                            st.session_state.game_state['current_scene_index'] = 0
+                    if 'scene_start_time' in st.session_state:
+                        del st.session_state.scene_start_time
+                    st.rerun()
+    
+    # 프롤로그 완료 시 Chapter 1 진행 버튼 표시
+    else:
+        # 프롤로그가 완료된 경우
+        if current_ep >= len(PROLOGUE_EPISODES):
+            st.session_state.game_state['prologue_completed'] = True
+            check_achievements()  # 프롤로그 완료 업적 체크
+            
+            st.markdown('<div class="message-box">', unsafe_allow_html=True)
+            st.markdown('<h3 style="text-align: center; color: #333;">🎉 프롤로그 완료! 🎉</h3>', unsafe_allow_html=True)
+            st.markdown('<p style="text-align: center; color: #666;">과거의 기억을 되찾은 당신... 이제 본격적인 이야기가 시작됩니다!</p>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # 특별한 스타일의 Chapter 1 진행 버튼
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                # CSS 클래스를 적용한 특별한 버튼
+                st.markdown("""
+                <style>
+                .chapter-button {
+                    background: linear-gradient(45deg, #ff6b6b 0%, #ffa726 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 15px;
+                    padding: 15px 30px;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    cursor: pointer;
+                    width: 100%;
+                    height: 70px;
+                    animation: glow 2s ease-in-out infinite alternate;
+                    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+                }
+                
+                .chapter-button:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 30px rgba(255, 167, 38, 0.6);
+                }
+                
+                @keyframes glow {
+                    from { box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); }
+                    to { box-shadow: 0 8px 30px rgba(255, 167, 38, 0.6); }
+                }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                if st.button("🌟 Chapter 1: 마법학원에서의 새로운 시작 🌟", 
+                           key="start_chapter1", 
+                           help="Chapter 1으로 진행하기"):
+                    st.session_state.game_state['current_scene'] = 'chapter_1'
+                    st.session_state.game_state['current_episode'] = 1
+                    st.session_state.game_state['current_scene_index'] = 0
+                    if 'scene_start_time' in st.session_state:
+                        del st.session_state.scene_start_time
+                    st.rerun()
+    
+    # 진행 상황 표시
+    if scene_index < len(episode['scenes']):
+        progress = min(max((scene_index + 1) / len(episode['scenes']), 0.0), 1.0)
+        st.progress(progress)
+        st.markdown(f'<p style="text-align: center; color: #888;">프롤로그 에피소드 {current_ep}/3 - 진행률: {int(progress * 100)}%</p>', unsafe_allow_html=True)
+    else:
+        # 프롤로그 완료 시 100% 표시
+        st.progress(1.0)
+        st.markdown('<p style="text-align: center; color: #888;">프롤로그 완료! 🎉</p>', unsafe_allow_html=True)
+    
+    # 메뉴 버튼들
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
+    with col1:
+        if st.button("🏠 메뉴"):
+            st.session_state.game_state['current_scene'] = 'main_menu'
+            if 'scene_start_time' in st.session_state:
+                del st.session_state.scene_start_time
+            st.rerun()
+    with col2:
+        if st.button("⚙️ 설정"):
+            st.session_state.game_state['current_scene'] = 'settings'
+            if 'scene_start_time' in st.session_state:
+                del st.session_state.scene_start_time
+            st.rerun()
+    with col3:
+        if st.button("🏆 업적"):
+            st.session_state.game_state['current_scene'] = 'achievements'
+            if 'scene_start_time' in st.session_state:
+                del st.session_state.scene_start_time
+            st.rerun()
+    with col4:
+        if st.button("💾 저장"):
+            save_game()
+    with col5:
+        if current_ep > 1:
+            if st.button("🔄 이전"):
+                st.session_state.game_state['current_episode'] = current_ep - 1
+                st.session_state.game_state['current_scene_index'] = 0
+                if 'scene_start_time' in st.session_state:
+                    del st.session_state.scene_start_time
+                st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Chapter 1 표시 (완전한 버전)
 def show_chapter1():
@@ -870,8 +1096,7 @@ def show_chapter1():
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
                     else:
                         # Chapter 1의 마지막 에피소드인지 확인
-                        PROLOGUE_EPISODES = get_prologue_episodes()
-                        if current_ep >= len(PROLOGUE_EPISODES):
+                        if current_ep >= len(CHAPTER1_EPISODES):
                             st.session_state.game_state['current_scene'] = 'chapter_2'
                             st.session_state.game_state['current_episode'] = 1
                             st.session_state.game_state['current_scene_index'] = 0
@@ -932,6 +1157,8 @@ def show_chapter1():
             st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
+
+# 메인 실행 함수
 def main():
     init_game_data()
     
@@ -964,3 +1191,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
