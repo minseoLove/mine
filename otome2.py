@@ -870,7 +870,8 @@ def show_chapter1():
                         st.session_state.game_state['current_scene_index'] = scene_index + 1
                     else:
                         # Chapter 1의 마지막 에피소드인지 확인
-                        if current_ep >= len(CHAPTER1_EPISODES):
+                        PROLOGUE_EPISODES = get_prologue_episodes()
+                        if current_ep >= len(PROLOGUE_EPISODES):
                             st.session_state.game_state['current_scene'] = 'chapter_2'
                             st.session_state.game_state['current_episode'] = 1
                             st.session_state.game_state['current_scene_index'] = 0
